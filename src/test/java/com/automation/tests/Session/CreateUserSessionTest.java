@@ -2,6 +2,7 @@ package com.automation.tests.Session;
 
 import com.automation.Config.EnvironmentLoader;
 import com.automation.Utils.SessionUtil;
+import com.automation.enums.CategoryType;
 import com.automation.models.builders.ResponseBuilder;
 import com.automation.models.pojo.Session.CreateUserSession.UserSessionRequestBody;
 import com.automation.models.pojo.Session.CreateUserSession.UserCredentialsRequestBody;
@@ -13,23 +14,23 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 import com.automation.models.builders.RequestBuilder;
 import java.util.logging.Logger;
+import java.util.Optional;
 
-public class CreateUserSession {
+public class CreateUserSessionTest {
+
     private static final String SESSION_ENDPOINT = "/session";
-    private static String sessionToken;
-    private static final Logger log = Logger.getLogger(CreateUserSession.class.getName());
-    @Test
+    private static Optional<String> sessionToken = Optional.empty();
+    private static final Logger log = Logger.getLogger(CreateUserSessionTest.class.getName());
+
+    @Test(groups = CategoryType.SMOKE_GROUP)
     public void createSession() {
 
         // Arrange
-        log.info("Fetching environment variables (login, password, email) for session creation...");
         String login = EnvironmentLoader.getEnvVariable("login");
         String password = EnvironmentLoader.getEnvVariable("password");
         String email = EnvironmentLoader.getEnvVariable("email");
 
         validateEnvVariables(login, password, email);
-
-        log.info("Env variable fetched successfully.");
 
         UserCredentialsRequestBody credential = buildUserCredentials(login, password);
         UserSessionRequestBody userSession = new UserSessionRequestBody();
@@ -69,8 +70,9 @@ public class CreateUserSession {
         }
     }
 
-    @AfterMethod
+    @AfterMethod(alwaysRun = true)
     public void destroySession() {
+        log.info("Executing @AfterMethod - destroySession()");
         if (sessionToken != null) {
             log.info("Destroying session...");
             SessionUtil.destroySession(sessionToken);
