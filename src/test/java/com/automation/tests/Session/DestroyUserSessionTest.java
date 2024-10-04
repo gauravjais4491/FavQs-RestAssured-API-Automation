@@ -31,7 +31,7 @@ public class DestroyUserSessionTest {
     private static final String EXPECTED_RESPONSE_PATH = "src/test/resources/json/expectedResponse.json";
     private static final String EXPECTED_MESSAGE_KEY = "message";
     private static final Logger log = Logger.getLogger(DestroyUserSessionTest.class.getName());
-    private static Optional<String> sessionToken = Optional.empty();
+    private static String sessionToken;
     private static final String EXPECTED_CONTENT_TYPE = "application/json; charset=utf-8";
     private static final String content_Header_Key = "Content-Type";
     private static final String userToken_Header_Key = "User-Token";
@@ -40,9 +40,15 @@ public class DestroyUserSessionTest {
     @BeforeMethod(alwaysRun = true)
     public void destroySession() {
         log.info("Creating user session...");
-        UserSessionResponseBody userSessionResponseBody = SessionUtil.createSession();
-        sessionToken = Optional.of(userSessionResponseBody.getUserToken());
-        log.info("Session created successfully with token: " + userSessionResponseBody.getUserToken());
+        UserSessionResponseBody sessionResponse = SessionUtil.createSession();
+        if (sessionResponse != null && sessionResponse.getUserToken() != null) {
+            sessionToken = sessionResponse.getUserToken();
+            log.info("Session created successfully with token: " + sessionToken);
+        } else {
+            log.severe("Failed to create session!");
+            throw new IllegalStateException("Session creation failed.");
+        }
+        log.info("Session created successfully with token: " + sessionToken);
     }
 
     private Response sendDestroySessionRequest(RequestSpecification requestSpecification, ResponseSpecification responseSpecification) {

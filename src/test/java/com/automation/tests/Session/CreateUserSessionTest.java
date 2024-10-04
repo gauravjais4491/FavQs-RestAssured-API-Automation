@@ -36,8 +36,8 @@ public class CreateUserSessionTest {
     private static Optional<String> sessionToken = Optional.empty();
     private static final Logger log = Logger.getLogger(CreateUserSessionTest.class.getName());
     private static final String loginKey = "login";
-    private static final String passwordKey = "login";
-    private static final String emailKey = "login";
+    private static final String passwordKey = "password";
+    private static final String emailKey = "email";
     private static final String EXPECTED_CONTENT_TYPE = "application/json; charset=utf-8";
     private static final String content_Header_Key = "Content-Type";
 
