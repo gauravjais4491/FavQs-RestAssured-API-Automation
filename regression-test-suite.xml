@@ -12,8 +12,8 @@
             </run>
         </groups>
         <classes>
-            <class name="com.automation.tests.Session.CreateUserSession"/>
-            <class name="com.automation.tests.Session.DestroyUserSession"/>
+            <class name="com.automation.tests.Session.CreateUserSessionTest"/>
+            <class name="com.automation.tests.Session.DestroyUserSessionTest"/>
             <class name="com.automation.tests.Quotes.FavQuoteAPITest"/>
         </classes>
     </test>
