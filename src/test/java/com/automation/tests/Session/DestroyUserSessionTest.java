@@ -8,6 +8,7 @@ import com.automation.models.pojo.Session.CreateUserSession.UserSessionResponseB
 import com.automation.models.pojo.Session.DestroyUserSession.DestroySessionResponseBody;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.restassured.response.Response;
@@ -27,7 +28,6 @@ import java.util.logging.Logger;
 import static java.net.HttpURLConnection.HTTP_OK;
 
 public class DestroyUserSessionTest {
-    private static final String SESSION_ENDPOINT = "/session";
     private static final String EXPECTED_RESPONSE_PATH = "src/test/resources/json/expectedResponse.json";
     private static final String EXPECTED_MESSAGE_KEY = "message";
     private static final Logger log = Logger.getLogger(DestroyUserSessionTest.class.getName());
@@ -52,6 +52,7 @@ public class DestroyUserSessionTest {
     }
 
     private Response sendDestroySessionRequest(RequestSpecification requestSpecification, ResponseSpecification responseSpecification) {
+        String SESSION_ENDPOINT = "/session";
         return requestSpecification
                 .header(userToken_Header_Key,sessionToken)
                 .when()
@@ -107,34 +108,29 @@ public class DestroyUserSessionTest {
     }
 
     @Test(groups = {CategoryType.REGRESSION_GROUP})
-    public void validateDestroySessionResponseBody() {
+    public void validateDestroySessionResponseBody() throws IOException {
 
-        try {
-            // Arrange
-            String expectedMessage = JsonUtil.getValueFromJsonFile(EXPECTED_RESPONSE_PATH,EXPECTED_MESSAGE_KEY);
-            RequestSpecification requestSpecification = RequestBuilder.createRequestSpecification();
-            ResponseSpecification responseSpecification = ResponseBuilder.createResponseSpecification();
+        log.info("Starting validateDestroySessionResponseBody test...");
+        // Arrange
+        JsonNode jsonNode = JsonUtil.getJsonPathFromFile(EXPECTED_RESPONSE_PATH);
+        RequestSpecification requestSpecification = RequestBuilder.createRequestSpecification();
+        ResponseSpecification responseSpecification = ResponseBuilder.createResponseSpecification();
 
-            // Act
-            log.info("Destroying user session with token: " + sessionToken);
-            Response response = sendDestroySessionRequest(requestSpecification, responseSpecification);
+        // Act
+        log.info("Sending POST request to destroy session endpoint...");
+        Response response = sendDestroySessionRequest(requestSpecification, responseSpecification);
 
-            // Convert Json to POJO
-            DestroySessionResponseBody destroySessionResponseBody = parseResponse(response);
+        // Convert Json to POJO
+        DestroySessionResponseBody destroySessionResponseBody = parseResponse(response);
 
-            // Assert
-            SoftAssert softAssert = new SoftAssert();
-            softAssert.assertNotNull(destroySessionResponseBody, "DestroySessionResponseBody is null.");
-            softAssert.assertEquals(destroySessionResponseBody.getMessage(),expectedMessage, "Message does not match!");
+        // Assert
+        SoftAssert softAssert = new SoftAssert();
+        softAssert.assertNotNull(destroySessionResponseBody, "DestroySessionResponseBody is null.");
+        softAssert.assertEquals(destroySessionResponseBody.getMessage(),jsonNode.path(EXPECTED_MESSAGE_KEY).asText(), "Message does not match!");
 
-            //Assert All
-            softAssert.assertAll();
-            log.info("Session destroyed successfully.");
+        //Assert All
+        softAssert.assertAll();
 
-        }  catch (IOException e) {
-            Assert.fail("Failed to read expected message from JSON file: " + e.getMessage());
-        } catch (Exception e) {
-            Assert.fail("Test failed due to an unexpected error: " + e.getMessage());
-        }
+        log.info("validateDestroySessionResponseBody test completed successfully.");
     }
 }
