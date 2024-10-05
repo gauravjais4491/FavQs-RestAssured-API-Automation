@@ -1,22 +1,18 @@
 package com.automation.Utils;
 
-import io.restassured.path.json.JsonPath;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.File;
 import java.io.IOException;
 
 public class JsonUtil {
 
-    // Method to load and return the JsonPath of a JSON file
-    public static JsonPath getJsonPathFromFile(String filePath) throws IOException {
-        String jsonContent = new String(Files.readAllBytes(Paths.get(filePath)));
-        return new JsonPath(jsonContent);
-    }
+    public static JsonNode getJsonPathFromFile(String filePath) throws IOException {
+        // Create an ObjectMapper instance
+        ObjectMapper objectMapper = new ObjectMapper();
 
-    // Example of extracting a specific key if needed
-    public static String getValueFromJsonFile(String filePath, String key) throws IOException {
-        JsonPath jsonPath = getJsonPathFromFile(filePath);
-        System.out.println(jsonPath);
-        return jsonPath.getString(key);
+        // Read the JSON file into a JsonNode tree
+        return objectMapper.readTree(new File(filePath));
     }
 }
